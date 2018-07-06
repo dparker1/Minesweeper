@@ -1,5 +1,6 @@
 #include "Board.h"
 #include <cstdlib>
+#include <ctime>
 
 Board::Board(int width, int height, int mines)
 {
@@ -9,6 +10,7 @@ Board::Board(int width, int height, int mines)
 	int size = width * height;
 	board = new Cell*[size];
 	int m = 0;
+	srand(time(NULL));
 	for (int i = 0; i < width; i++)
 	{
 		for (int j = 0; j < height; j++)
@@ -29,7 +31,7 @@ Board::Board(int width, int height, int mines)
 					m++;
 				}
 			}
-			if (m == mines)
+			if (m == totalMines)
 			{
 				break;
 			}
@@ -51,74 +53,18 @@ Board::Board(int width, int height, int mines)
 			if (!c->mined())
 			{
 				int mines = 0;
-				if (i == 0)
+				for (int r = j - 1; r <= j + 1; r++)
 				{
-					mines += isMined(j, i + 1);
-					if (j == 0)
+					for (int c = i - 1; c <= i + 1; c++)
 					{
-						mines += isMined(j + 1, i) +
-							isMined(j + 1, i + 1);
+						if (r >= 0 && r < height && c >= 0 && c < width)
+						{
+							mines += isMined(r, c);
+						}
 					}
-					else if (j == height - 1)
-					{
-						mines += isMined(j - 1, i) +
-							isMined(j - 1, i + 1);
-					}
-					else
-					{
-						mines += isMined(j - 1, i) +
-							isMined(j - 1, i + 1) +
-							isMined(j + 1, i) +
-							isMined(j + 1, i + 1);
-					}
-				}
-				else if (j == 0)
-				{
-					mines += isMined(j + 1, i) +
-						isMined(j + 1, i - 1) +
-						isMined(j, i - 1);
-					if(i < width - 1)
-					{
-						mines += isMined(j + 1, i + 1) +
-							isMined(j, i + 1);
-					}
-				}
-				else if (i == width - 1)
-				{
-					mines += isMined(j, i - 1) +
-						isMined(j - 1, i) +
-						isMined(j - 1, i - 1);
-					if (j < height - 1)
-					{
-						mines += isMined(j + 1, i) +
-							isMined(j + 1, i - 1);
-					}
-				}
-				else if (j == height - 1)
-				{
-					mines += isMined(j, i - 1) +
-						isMined(j - 1, i) +
-						isMined(j - 1, i - 1);
-					if (i < width - 1)
-					{
-						mines += isMined(j - 1, i + 1) +
-							isMined(j, i + 1);
-					}
-				}
-				else
-				{
-					mines += isMined(j - 1, i - 1) +
-						isMined(j - 1, i) +
-						isMined(j - 1, i + 1) +
-						isMined(j, i - 1) +
-						isMined(j, i + 1) +
-						isMined(j + 1, i - 1) +
-						isMined(j + 1, i) +
-						isMined(j + 1, i + 1);
 				}
 				c->setMines(mines);
 			}
-			
 		}
 	}
 }
@@ -161,6 +107,18 @@ void Board::reveal(int row, int column)
 	{
 		getCell(row, column)->revealed = true;
 		getCell(row, column)->flagged = false;
+		if (mines(row, column) == 0)
+		{
+			for (int r = row - 1; r <= row + 1; r++)
+			{
+				for (int c = column - 1; c <= column + 1; c++)
+				{
+					if (!(r == row && c == column) && (r >= 0 && r < height && c >= 0 && c < width)) {
+						reveal(r, c);
+					}
+				}
+			}
+		}
 	}
 }
 
