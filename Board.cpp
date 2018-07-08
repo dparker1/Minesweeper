@@ -113,7 +113,7 @@ void Board::reveal(int row, int column)
 			{
 				for (int c = column - 1; c <= column + 1; c++)
 				{
-					if (!(r == row && c == column) && (r >= 0 && r < height && c >= 0 && c < width)) {
+					if (!(r == row && c == column) && (r >= 0 && r < height && c >= 0 && c < width) && !isRevealed(r,c)) {
 						reveal(r, c);
 					}
 				}
