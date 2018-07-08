@@ -1,0 +1,12 @@
+﻿  stb_image.cpp
+  main.cpp
+c:\users\mdsdamin\documents\visual studio 2015\projects\minesweeper\main.cpp(3): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
+  c:\users\mdsdamin\documents\visual studio 2015\projects\minesweeper\main.cpp(3): note: command-line arguments:  see previous definition of '_CRT_SECURE_NO_WARNINGS'
+c:\users\mdsdamin\documents\visual studio 2015\projects\minesweeper\main.cpp(53): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\mdsdamin\documents\visual studio 2015\projects\minesweeper\main.cpp(63): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\mdsdamin\documents\visual studio 2015\projects\minesweeper\main.cpp(127): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+  Cell.cpp
+  Board.cpp
+c:\users\mdsdamin\documents\visual studio 2015\projects\minesweeper\board.cpp(13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  Generating Code...
+LINK : fatal error LNK1104: cannot open file 'freeglut.lib'
