@@ -9,19 +9,15 @@
 #include "stb_image.h"
 #include <math.h>
 #include "Board.h"
+#include "Button.h"
 
 
 int window;
-GLuint *textures;
+GLuint* textures;
 Board* b;
 double trueX, trueY;
 int windowWidth = 1600, windowHeight = 900;
 double halfWidth = windowWidth / 2, halfHeight = windowHeight / 2;
-double boardTop = 0.95,
-	boardBottom = -0.95,
-	boardLeft = -0.95,
-	boardRight = 0.6;
-double boardIncrementX, boardIncrementY;
 
 void loadTexture(GLuint texture, const char* filename)
 {
@@ -35,17 +31,6 @@ void loadTexture(GLuint texture, const char* filename)
 	data = stbi_load(filename, &width, &height, &nrChan, 0);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	stbi_image_free(data);
-}
-
-bool withinBoard(int x, int y)
-{
-	return x >= boardLeft && x <= boardRight && y <= boardTop && y >= boardBottom;
-}
-
-void updateBoardIncrements()
-{
-	boardIncrementX = (boardRight - boardLeft) / (b->width);
-	boardIncrementY = (boardTop - boardBottom) / (b->height);
 }
 
 void render()
@@ -75,20 +60,20 @@ void render()
 			glBindTexture(GL_TEXTURE_2D, textures[text]);
 			glBegin(GL_QUADS);
 			glTexCoord2d(0, 1);
-			glVertex2d(boardLeft + boardIncrementX * col,
-				boardTop - boardIncrementY * (row + 1));
+			glVertex2d(b->left + b->incrementX * col,
+				b->top - b->incrementY * (row + 1));
 
 			glTexCoord2d(0, 0);
-			glVertex2d(boardLeft + boardIncrementX * col,
-				boardTop - boardIncrementY * row);
+			glVertex2d(b->left + b->incrementX * col,
+				b->top - b->incrementY * row);
 
 			glTexCoord2d(1, 0);
-			glVertex2d(boardLeft + boardIncrementX * (col + 1),
-				boardTop - boardIncrementY * row);
+			glVertex2d(b->left + b->incrementX * (col + 1),
+				b->top - b->incrementY * row);
 
 			glTexCoord2d(1, 1);
-			glVertex2d(boardLeft + boardIncrementX * (col + 1),
-				boardTop - boardIncrementY * (row + 1));
+			glVertex2d(b->left + b->incrementX * (col + 1),
+				b->top - b->incrementY * (row + 1));
 			glEnd();
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
@@ -111,20 +96,20 @@ void mouseCallback(int button, int state, int x, int y)
 	trueY = 1 - (y / halfHeight);
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
-		if (withinBoard(trueX, trueY))
+		if (b->withinBoard(trueX, trueY))
 		{
-			int r = (int)floor((boardTop - trueY) / boardIncrementY);
-			int c = (int)floor((trueX - boardLeft) / boardIncrementX);
+			int r = (int)floor((b->top - trueY) / b->incrementY);
+			int c = (int)floor((trueX - b->left) / b->incrementX);
 			b->click(r, c);
 		}
 	}
 
 	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
 	{
-		if (withinBoard(trueX, trueY))
+		if (b->withinBoard(trueX, trueY))
 		{
-			int r = (int)floor((boardTop - trueY) / boardIncrementY);
-			int c = (int)floor((trueX - boardLeft) / boardIncrementX);
+			int r = (int)floor((b->top - trueY) / b->incrementY);
+			int c = (int)floor((trueX - b->left) / b->incrementX);
 			b->changeFlag(r, c);
 		}
 	}
@@ -162,7 +147,6 @@ int main(int argc, char** argv)
 	loadTexture(textures[11], "assets/flagged.png");
 
 	b = new Board(10, 10, 20);
-	updateBoardIncrements();
 
 	glutDisplayFunc(render);
 	glutReshapeFunc(resize);
@@ -174,6 +158,7 @@ int main(int argc, char** argv)
 
 
 	delete textures;
+	delete b;
 	exit(EXIT_SUCCESS);
 	return 0;
 }

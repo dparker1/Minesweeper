@@ -9,6 +9,8 @@ Board::Board(int width, int height, int mines)
 	totalMines = mines;
 	int size = width * height;
 	board = new Cell*[size];
+	updateBoardIncrements();
+
 	int m = 0;
 	srand(time(NULL));
 	for (int i = 0; i < width; i++)
@@ -101,6 +103,14 @@ bool Board::isFlagged(int row, int column)
 	return getCell(row, column)->flagged;
 }
 
+bool Board::withinBoard(int x, int y)
+{
+	return x >= left &&
+		x <= right &&
+		y <= top &&
+		y >= bottom;
+}
+
 void Board::reveal(int row, int column)
 {
 	if (!isRevealed(row, column))
@@ -130,6 +140,12 @@ void Board::changeFlag(int row, int column)
 void Board::click(int row, int column)
 {
 	reveal(row, column);
+}
+
+void Board::updateBoardIncrements()
+{
+	incrementX = (right - left) / (width);
+	incrementY = (top - bottom) / (height);
 }
 
 int Board::mines(int row, int column)
