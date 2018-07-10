@@ -2,7 +2,7 @@
 
 
 
-Button::Button(int w, int h, int x, int y, ButtonCallback func)
+Button::Button(double w, double h, double x, double y, ButtonCallback func)
 {
 	width = w;
 	height = h;
@@ -15,7 +15,7 @@ Button::~Button()
 {
 }
 
-bool Button::withinButton(int x, int y)
+bool Button::withinButton(double x, double y)
 {
 	return x >= this->x &&
 		x <= (this->x + width) &&

@@ -5,16 +5,16 @@ typedef void(*ButtonCallback)(void);
 class Button
 {
 public:
-	Button(int width, int height, int x, int y, ButtonCallback func);
+	Button(double width, double height, double x, double y, ButtonCallback func);
 	~Button();
-	bool withinButton(int x, int y);
+	bool withinButton(double x, double y);
 	void click();
 
 
-	int width;
-	int height;
-	int x;
-	int y;
+	double width;
+	double height;
+	double x;
+	double y;
 	ButtonCallback func;
 };
 

@@ -1,17 +1,22 @@
-#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
 #include <windows.h>
 #include <stdio.h>
+#include <math.h>
+#include <vector>
+#include <iostream>
+
 #include "GL\glew.h"
 #include "GL\freeglut.h"
 #include "stb_image.h"
-#include <math.h>
+
 #include "Board.h"
 #include "Button.h"
 
 
 int window;
 GLuint* textures;
+std::vector<Button> buttons;
 Board* b;
 double trueX, trueY;
 int windowWidth = 1600, windowHeight = 900;
@@ -31,11 +36,8 @@ void loadTexture(GLuint texture, const char* filename)
 	stbi_image_free(data);
 }
 
-void render()
+void drawBoard()
 {
-	glViewport(0, 0, windowWidth, windowHeight);
-	glClearColor(0.2, 0.2, 0.2, 0.5);
-	glClear(GL_COLOR_BUFFER_BIT);
 	glEnable(GL_TEXTURE_2D);
 	for (int row = 0; row < b->height; row++)
 	{
@@ -76,6 +78,34 @@ void render()
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 	}
+	glDisable(GL_TEXTURE_2D);
+}
+
+void drawButtons()
+{
+	for (int button = 0; button < buttons.size(); button++)
+	{
+		Button curr = buttons.at(button);
+		glColor3d(1, 0, 0);
+		glBegin(GL_QUADS);
+		glVertex2d(curr.x, curr.y + curr.height);
+		glVertex2d(curr.x, curr.y);
+		glVertex2d(curr.x + curr.width, curr.y);
+		glVertex2d(curr.x + curr.width, curr.y + curr.height);
+		glEnd();
+		glColor3d(1, 1, 1);
+	}
+}
+
+void render()
+{
+	glViewport(0, 0, windowWidth, windowHeight);
+	glClearColor(0.2, 0.2, 0.2, 0.5);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	drawBoard();
+	drawButtons();
+
 	glFlush();
 	glutSwapBuffers();
 }
@@ -86,6 +116,11 @@ void resize(int w, int h)
 	halfWidth = w / 2;
 	windowHeight = h;
 	halfHeight = h / 2;
+}
+
+void newGameCallback()
+{
+	b = new Board(10, 10, 20);
 }
 
 void mouseCallback(int button, int state, int x, int y)
@@ -99,6 +134,13 @@ void mouseCallback(int button, int state, int x, int y)
 			int r = (int)floor((b->top - trueY) / b->incrementY);
 			int c = (int)floor((trueX - b->left) / b->incrementX);
 			b->click(r, c);
+		}
+		for (int button = 0; button < buttons.size(); button++)
+		{
+			if (buttons.at(button).withinButton(trueX, trueY))
+			{
+				buttons.at(button).click();
+			}
 		}
 	}
 
@@ -145,6 +187,8 @@ int main(int argc, char** argv)
 	loadTexture(textures[11], "assets/flagged.png");
 
 	b = new Board(10, 10, 20);
+	buttons.push_back(Button(0.2, 0.1, 0.7, 0, newGameCallback));
+
 
 	glutDisplayFunc(render);
 	glutReshapeFunc(resize);
