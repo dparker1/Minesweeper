@@ -14,6 +14,7 @@ public:
 	void reveal(int row, int column);
 	void changeFlag(int row, int column);
 	void click(int row, int column);
+	void calculateMinesRemaining();
 	int mines(int row, int column);
 
 	int width;
@@ -25,6 +26,8 @@ public:
 		left = -0.95,
 		right = 0.6;
 	int totalMines;
+	int displayedMinesRemaining;
+	int actualMinesRemaining;
 	Cell** board;
 
 private:

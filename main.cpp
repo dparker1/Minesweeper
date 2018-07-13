@@ -151,6 +151,7 @@ void mouseCallback(int button, int state, int x, int y)
 			int r = (int)floor((b->top - trueY) / b->incrementY);
 			int c = (int)floor((trueX - b->left) / b->incrementX);
 			b->changeFlag(r, c);
+			std::cout << b->displayedMinesRemaining << std::endl;
 		}
 	}
 }
