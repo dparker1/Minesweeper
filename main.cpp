@@ -1,10 +1,9 @@
-//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
 #include <windows.h>
 #include <stdio.h>
 #include <math.h>
 #include <vector>
-#include <iostream>
 
 #include "GL\glew.h"
 #include "GL\freeglut.h"
@@ -21,6 +20,7 @@ Board* b;
 double trueX, trueY;
 int windowWidth = 1600, windowHeight = 900;
 double halfWidth = windowWidth / 2, halfHeight = windowHeight / 2;
+double digitalLength = 0.03, digitalWidth = 0.005;
 
 void loadTexture(GLuint texture, const char* filename)
 {
@@ -81,6 +81,14 @@ void drawBoard()
 	glDisable(GL_TEXTURE_2D);
 }
 
+void drawBoxVertices(double x, double y, double w, double h)
+{
+	glVertex2d(x, y - h);
+	glVertex2d(x, y);
+	glVertex2d(x + w, y);
+	glVertex2d(x + w, y - h);
+}
+
 void drawButtons()
 {
 	for (int button = 0; button < buttons.size(); button++)
@@ -88,13 +96,115 @@ void drawButtons()
 		Button curr = buttons.at(button);
 		glColor3d(1, 0, 0);
 		glBegin(GL_QUADS);
-		glVertex2d(curr.x, curr.y + curr.height);
-		glVertex2d(curr.x, curr.y);
-		glVertex2d(curr.x + curr.width, curr.y);
-		glVertex2d(curr.x + curr.width, curr.y + curr.height);
+		glVertex2d(curr.left, curr.bottom);
+		glVertex2d(curr.left, curr.top);
+		glVertex2d(curr.right, curr.top);
+		glVertex2d(curr.right, curr.bottom);
 		glEnd();
 		glColor3d(1, 1, 1);
 	}
+}
+
+/*
+l1 - top horizontal
+l2 - top right vertical
+l3 - bottom right vertical
+l4 - bottom horizontal
+l5 - bottom left vertical
+l6 - top left vertical
+l7 - middle horizontal
+*/
+void drawDigitalLegs(double x, double y, bool l1, bool l2, bool l3, bool l4, bool l5, bool l6, bool l7)
+{
+	if (l1)
+	{
+		drawBoxVertices(x + digitalWidth, y, digitalLength - digitalWidth, digitalWidth);
+	}
+	if (l2)
+	{
+		drawBoxVertices(x + digitalLength, y, digitalWidth, digitalLength);
+	}
+	if (l3)
+	{
+		drawBoxVertices(x + digitalLength, y - digitalLength, digitalWidth, digitalLength);
+	}
+	if (l4)
+	{
+		drawBoxVertices(x + digitalWidth, y - (2 * digitalLength) + digitalWidth, digitalLength - digitalWidth, digitalWidth);
+	}
+	if (l5)
+	{
+		drawBoxVertices(x, y - digitalLength, digitalWidth, digitalLength);
+	}
+	if (l6)
+	{
+		drawBoxVertices(x, y, digitalWidth, digitalLength);
+	}
+	if (l7)
+	{
+		drawBoxVertices(x + digitalWidth, y - digitalLength, digitalLength - digitalWidth, digitalWidth);
+	}
+}
+
+void drawDigitalNumber(int n, double x, double y)
+{
+	glColor3d(1, 0, 0);
+	glBegin(GL_QUADS);
+	switch (n)
+	{
+	case 0:
+		drawDigitalLegs(x, y, 1, 1, 1, 1, 1, 1, 0);
+		break;
+	case 1:
+		drawDigitalLegs(x, y, 0, 1, 1, 0, 0, 0, 0);
+		break;
+	case 2:
+		drawDigitalLegs(x, y, 1, 1, 0, 1, 1, 0, 1);
+		break;
+	case 3:
+		drawDigitalLegs(x, y, 1, 1, 1, 1, 0, 0, 1);
+		break;
+	case 4:
+		drawDigitalLegs(x, y, 0, 1, 1, 0, 0, 1, 1);
+		break;
+	case 5:
+		drawDigitalLegs(x, y, 1, 0, 1, 1, 0, 1, 1);
+		break;
+	case 6:
+		drawDigitalLegs(x, y, 1, 0, 1, 1, 1, 1, 1);
+		break;
+	case 7:
+		drawDigitalLegs(x, y, 1, 1, 1, 0, 0, 0, 0);
+		break;
+	case 8:
+		drawDigitalLegs(x, y, 1, 1, 1, 1, 1, 1, 1);
+		break;
+	case 9:
+		drawDigitalLegs(x, y, 1, 1, 1, 1, 0, 1, 1);
+		break;
+	}
+	glEnd();
+	glColor3d(1, 1, 1);
+}
+
+void drawGameState()
+{
+	glColor3d(0, 0, 0);
+	glBegin(GL_QUADS);
+	drawBoxVertices(0.65, 0.5, digitalLength * 3, digitalLength * 2);
+	drawBoxVertices(0.8, 0.5, digitalLength * 3, digitalLength * 2);
+	glEnd();
+	glColor3d(1, 1, 1);
+
+	int minesTotald1 = b->totalMines / 10;
+	int minesTotald2 = b->totalMines % 10;
+	int minesRemainingd1 = b->displayedMinesRemaining / 10;
+	int minesRemainingd2 = b->displayedMinesRemaining % 10;
+	drawDigitalNumber(minesTotald1, 0.65, 0.5);
+	drawDigitalNumber(minesTotald2, 0.7, 0.5);
+	drawDigitalNumber(minesRemainingd1, 0.8, 0.5);
+	drawDigitalNumber(minesRemainingd2, 0.85, 0.5);
+	
 }
 
 void render()
@@ -105,6 +215,7 @@ void render()
 
 	drawBoard();
 	drawButtons();
+	drawGameState();
 
 	glFlush();
 	glutSwapBuffers();
@@ -151,7 +262,6 @@ void mouseCallback(int button, int state, int x, int y)
 			int r = (int)floor((b->top - trueY) / b->incrementY);
 			int c = (int)floor((trueX - b->left) / b->incrementX);
 			b->changeFlag(r, c);
-			std::cout << b->displayedMinesRemaining << std::endl;
 		}
 	}
 }
@@ -188,7 +298,7 @@ int main(int argc, char** argv)
 	loadTexture(textures[11], "assets/flagged.png");
 
 	b = new Board(10, 10, 20);
-	buttons.push_back(Button(0.2, 0.1, 0.7, 0, newGameCallback));
+	buttons.push_back(Button(0.7, 0.9, 0.1, 0, newGameCallback));
 
 
 	glutDisplayFunc(render);

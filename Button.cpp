@@ -1,13 +1,11 @@
 #include "Button.h"
 
-
-
-Button::Button(double w, double h, double x, double y, ButtonCallback func)
+Button::Button(double l, double r, double t, double b, ButtonCallback func)
 {
-	width = w;
-	height = h;
-	this->x = x;
-	this->y = y;
+	left = l;
+	right = r;
+	top = t;
+	bottom = b;
 	this->func = func;
 }
 
@@ -17,10 +15,10 @@ Button::~Button()
 
 bool Button::withinButton(double x, double y)
 {
-	return x >= this->x &&
-		x <= (this->x + width) &&
-		y <= (this->y + height) &&
-		y >= this->y;
+	return x >= this->left &&
+		x <= right &&
+		y <= top &&
+		y >= bottom;
 }
 
 void Button::click()

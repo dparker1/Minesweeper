@@ -10,7 +10,7 @@ public:
 	bool isMined(int row, int column);
 	bool isRevealed(int row, int column);
 	bool isFlagged(int row, int column);
-	bool withinBoard(int x, int y);
+	bool withinBoard(double x, double y);
 	void reveal(int row, int column);
 	void changeFlag(int row, int column);
 	void click(int row, int column);

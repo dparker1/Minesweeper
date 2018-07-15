@@ -105,7 +105,7 @@ bool Board::isFlagged(int row, int column)
 	return getCell(row, column)->flagged;
 }
 
-bool Board::withinBoard(int x, int y)
+bool Board::withinBoard(double x, double y)
 {
 	return x >= left &&
 		x <= right &&
