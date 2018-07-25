@@ -13,8 +13,8 @@ public:
 	bool withinBoard(double x, double y);
 	void reveal(int row, int column);
 	void changeFlag(int row, int column);
-	void click(int row, int column);
 	void calculateMinesRemaining();
+	void click(int row, int column);
 	int mines(int row, int column);
 
 	int width;
@@ -29,6 +29,7 @@ public:
 	int displayedMinesRemaining;
 	int actualMinesRemaining;
 	Cell** board;
+	int state;
 
 private:
 	void updateBoardIncrements();

@@ -11,6 +11,7 @@ Board::Board(int width, int height, int mines)
 	actualMinesRemaining = mines;
 	int size = width * height;
 	board = new Cell*[size];
+	state = 1;
 	updateBoardIncrements();
 
 	int m = 0;
@@ -143,6 +144,7 @@ void Board::changeFlag(int row, int column)
 void Board::click(int row, int column)
 {
 	reveal(row, column);
+	state = (isMined(row, column) ? -1 : 1);
 }
 
 void Board::calculateMinesRemaining()
@@ -165,6 +167,10 @@ void Board::calculateMinesRemaining()
 		}
 	}
 	displayedMinesRemaining = totalMines - flags;
+	if (actualMinesRemaining == 0)
+	{
+		state = 0;
+	}
 }
 
 void Board::updateBoardIncrements()
