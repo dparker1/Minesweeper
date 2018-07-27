@@ -94,18 +94,6 @@ void drawButtons()
 	for (int button = 0; button < buttons.size(); button++)
 	{
 		Button curr = buttons.at(button);
-		switch (b->state)
-		{
-		case 1:
-			glColor3d(1, 1, 0);
-			break;
-		case 0:
-			glColor3d(0, 1, 0);
-			break;
-		case -1:
-			glColor3d(1, 0, 0);
-			break;
-		}
 		glBegin(GL_QUADS);
 		glVertex2d(curr.left, curr.bottom);
 		glVertex2d(curr.left, curr.top);
@@ -114,6 +102,29 @@ void drawButtons()
 		glEnd();
 		glColor3d(1, 1, 1);
 	}
+}
+
+void drawStateBox()
+{
+	switch (b->state)
+	{
+	case 2:
+		glColor3d(1, 0.5, 0);
+		break;
+	case 1:
+		glColor3d(1, 1, 0);
+		break;
+	case 0:
+		glColor3d(0, 1, 0);
+		break;
+	case -1:
+		glColor3d(1, 0, 0);
+		break;
+	}
+	glBegin(GL_QUADS);
+	drawBoxVertices(0.75, 0.5, 0.04, 0.05);
+	glEnd();
+	glColor3d(1, 1, 1);
 }
 
 /*
@@ -227,6 +238,7 @@ void render()
 	drawBoard();
 	drawButtons();
 	drawGameState();
+	drawStateBox();
 
 	glFlush();
 	glutSwapBuffers();
@@ -250,6 +262,14 @@ void mouseCallback(int button, int state, int x, int y)
 	trueX = (x / halfWidth) - 1;
 	trueY = 1 - (y / halfHeight);
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
+		if (b->withinBoard(trueX, trueY) && b->state > 0)
+		{
+			b->state = 2;
+		}
+	}
+
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
 	{
 		if (b->withinBoard(trueX, trueY) && b->state > 0)
 		{
