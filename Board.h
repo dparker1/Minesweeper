@@ -15,6 +15,7 @@ public:
 	void changeFlag(int row, int column);
 	void calculateMinesRemaining();
 	void click(int row, int column);
+	void bothClick(int row, int column);
 	int mines(int row, int column);
 
 	int width;
@@ -33,5 +34,7 @@ public:
 
 private:
 	void updateBoardIncrements();
+
+	int getMinesSurrounding(int row, int column);
 };
 

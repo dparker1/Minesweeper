@@ -17,6 +17,7 @@ int window;
 GLuint* textures;
 std::vector<Button> buttons;
 Board* b;
+bool leftClick, rightClick;
 double trueX, trueY;
 int windowWidth = 1600, windowHeight = 900;
 double halfWidth = windowWidth / 2, halfHeight = windowHeight / 2;
@@ -261,16 +262,32 @@ void mouseCallback(int button, int state, int x, int y)
 {
 	trueX = (x / halfWidth) - 1;
 	trueY = 1 - (y / halfHeight);
+	
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
-		if (b->withinBoard(trueX, trueY) && b->state > 0)
-		{
-			b->state = 2;
-		}
+		leftClick = true;
+		b->state = 2;
 	}
 
-	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
+	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
 	{
+		rightClick = true;
+	}
+
+	if (leftClick && rightClick)
+	{
+		leftClick = false;
+		rightClick = false;
+		if (b->withinBoard(trueX, trueY) && b->state > 0)
+		{
+			int r = (int)floor((b->top - trueY) / b->incrementY);
+			int c = (int)floor((trueX - b->left) / b->incrementX);
+			b->bothClick(r, c);
+		}
+	}
+	else if (leftClick && button == GLUT_LEFT_BUTTON && state == GLUT_UP)
+	{
+		leftClick = false;
 		if (b->withinBoard(trueX, trueY) && b->state > 0)
 		{
 			int r = (int)floor((b->top - trueY) / b->incrementY);
@@ -285,10 +302,10 @@ void mouseCallback(int button, int state, int x, int y)
 			}
 		}
 	}
-
-	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+	else if (rightClick)
 	{
-		if (b->withinBoard(trueX, trueY))
+		rightClick = false;
+		if (b->withinBoard(trueX, trueY) && b->state > 0)
 		{
 			int r = (int)floor((b->top - trueY) / b->incrementY);
 			int c = (int)floor((trueX - b->left) / b->incrementX);
@@ -309,7 +326,7 @@ int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowPosition(100, 100);
+	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(windowWidth, windowHeight);
 	window = glutCreateWindow("Minesweeper");
 

@@ -57,18 +57,7 @@ Board::Board(int width, int height, int mines)
 			Cell* c = getCell(j, i);
 			if (!c->mined())
 			{
-				int mines = 0;
-				for (int r = j - 1; r <= j + 1; r++)
-				{
-					for (int c = i - 1; c <= i + 1; c++)
-					{
-						if (r >= 0 && r < height && c >= 0 && c < width)
-						{
-							mines += isMined(r, c);
-						}
-					}
-				}
-				c->setMines(mines);
+				c->setMines(getMinesSurrounding(j, i));
 			}
 		}
 	}
@@ -147,6 +136,38 @@ void Board::click(int row, int column)
 	state = (isMined(row, column) ? -1 : 1);
 }
 
+void Board::bothClick(int row, int column)
+{
+	if (isRevealed(row, column))
+	{
+		int mines = getMinesSurrounding(row, column);
+		for (int r = row - 1; r <= row + 1; r++)
+		{
+			for (int c = column - 1; c <= column + 1; c++)
+			{
+				if (r >= 0 && r < height && c >= 0 && c < width && isMined(r, c) && isFlagged(r, c))
+				{
+					mines--;
+				}
+			}
+		}
+		if (mines == 0)
+		{
+			for (int r = row - 1; r <= row + 1; r++)
+			{
+				for (int c = column - 1; c <= column + 1; c++)
+				{
+					if (r >= 0 && r < height && c >= 0 && c < width && !isMined(r, c))
+					{
+						reveal(r, c);
+					}
+				}
+			}
+		}
+	}
+	state = 1;
+}
+
 void Board::calculateMinesRemaining()
 {
 	int flags = 0;
@@ -177,6 +198,22 @@ void Board::updateBoardIncrements()
 {
 	incrementX = (right - left) / (width);
 	incrementY = (top - bottom) / (height);
+}
+
+int Board::getMinesSurrounding(int row, int column)
+{
+	int mines = 0;
+	for (int r = row - 1; r <= row + 1; r++)
+	{
+		for (int c = column - 1; c <= column + 1; c++)
+		{
+			if (r >= 0 && r < height && c >= 0 && c < width)
+			{
+				mines += isMined(r, c);
+			}
+		}
+	}
+	return mines;
 }
 
 int Board::mines(int row, int column)
